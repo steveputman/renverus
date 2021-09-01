@@ -1,11 +1,18 @@
 Package: renverus
 Title: API Wrapper for Enverus
 Version: 0.0.0.9000
-Authors@R (parsed): 
-  * Steve Putman <steve.putman@gmail.com> [aut, cre]
+Authors@R: 
+        person(given = "Steve",
+           family = "Putman",
+           role = c("aut", "cre"),
+           email = "steve.putman@gmail.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: Provides API functionality to Enverus products.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+Imports: 
+    httr,
+    magrittr
