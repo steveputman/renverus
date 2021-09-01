@@ -8,7 +8,7 @@
 #' 5xx errors are handled by the session's Retry configuration. Debug logging returns retries remaining.
 #' @param response [xx-formatted] HTTP response
 #' @return Any error messages
-check_response <- function(response) {
+check_response <- function(response, querydataset, ...) {
   tokenrequest <- stringr::str_detect(response$url, "tokens")
   if (httr::http_error(response)) {
     if (httr::status_code(response) == 400) {
@@ -21,14 +21,18 @@ check_response <- function(response) {
     if (httr::status_code(response) == 401) {
       Sys.setenv("ENVERUS_ACCESS_TOKEN" = "")
       get_access_token()
-      httr::message_for_status(response, "connect with token. Obtaining new token.")
+      httr::message_for_status(response, "authenticate; token missing or expired. Obtaining new token")
+      query(querydataset, ...)
     }
     if (httr::status_code(response) == 403 & tokenrequest) {
-      httr::message_for_status(response, "obtain token. Waiting 60 seconds to retry.")
+      httr::message_for_status(response, "obtain token. Waiting 60 seconds to retry")
       Sys.sleep(60)
+      query(querydataset, ...)
     }
     if (httr::status_code(response) == 404) {
       httr::warn_for_status(response, "locate dataset.")
     }
+  } else {
+    return(response)
   }
 }
