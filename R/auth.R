@@ -49,7 +49,6 @@ get_access_token <- function(api_key = Sys.getenv("ENVERUS_API_KEY"), client_id 
                         httr::verbose())
     token <- httr::content(request)$access_token
     Sys.setenv("ENVERUS_ACCESS_TOKEN" = token)
-    return(token)
   }
 }
 
