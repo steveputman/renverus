@@ -34,19 +34,18 @@
 get_access_token <- function(api_key = Sys.getenv("ENVERUS_API_KEY"), client_id =
                                Sys.getenv("ENVERUS_CLIENT_ID"), client_secret =
                                Sys.getenv("ENVERUS_CLIENT_SECRET")) {
-  if (Sys.getenv("ENVERUS_ACCESS_TOKEN") != "") {
-    token <- Sys.getenv("ENVERUS_ACCESS_TOKEN")
-  } else {
-      if (anyNA(c(api_key, client_id, client_secret))) {
+  if (anyNA(c(api_key, client_id, client_secret))) {
     abort("`api_key`, `client_id`, and:`client_secret` must be strings.")
   }
-    token_url <- "https://di-api.drillinginfo.com/v2/direct-access"
-    request <- httr::POST(glue::glue("{token_url}/tokens"),
+  token_url <- "https://di-api.drillinginfo.com/v2/direct-access/tokens"
+  response <- httr::POST(token_url,
                         body = list("grant_type" = "client_credentials"),
                         encode = "form",
                         httr::add_headers("X-API-KEY" = api_key),
                         httr::authenticate(client_id, client_secret),
                         httr::verbose())
+  resp_status <- check_response(token)
+  if (resp_status == "ok") {
     token <- httr::content(request)$access_token
     Sys.setenv("ENVERUS_ACCESS_TOKEN" = token)
   }
