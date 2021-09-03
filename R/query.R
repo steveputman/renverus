@@ -31,7 +31,7 @@ query <- function(dataset, manretry = 2, ...) {
   if (errors == "ok") {
     content <- httr::content(queryresponse)
     x <- 1
-    while (stringr::str_detect(queryresponse$headers$links, "next") & x < 20) {
+    while (has_link(queryresponse) == TRUE) {
       nexturl <- stringr::str_match(queryresponse$headers$links, "<(.*?)>")[[2]]
       queryurl <- glue::glue(apiurl, nexturl)
       queryresponse <-   httr::GET(queryurl,
@@ -40,7 +40,6 @@ query <- function(dataset, manretry = 2, ...) {
                                    "Authorization" = glue::glue("Bearer {access_token}")),
                                     httr::verbose())
       content <- c(content, httr::content(queryresponse))
-      x <- x + 1
     }
     return(content)
   }
