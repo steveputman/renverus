@@ -30,7 +30,7 @@ query <- function(dataset, manretry = 2, ...) {
   }
   if (errors == "ok") {
     content <- httr::content(queryresponse)
-    while (stringr::str_detect(queryresponse$headers$links, "next")) {
+    while (has_link(queryresponse) == TRUE) {
       nexturl <- stringr::str_match(queryresponse$headers$links, "<(.*?)>")[[2]]
       queryurl <- glue::glue(apiurl, nexturl)
       queryresponse <-   httr::GET(queryurl,
