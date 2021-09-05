@@ -3,11 +3,12 @@ query <- function(dataset, manretry = 2, ...) {
   access_token <- Sys.getenv("ENVERUS_ACCESS_TOKEN")
   api_key <- Sys.getenv("ENVERUS_API_KEY")
   update_httr_config(api_key, access_token, TRUE)
-  filters = list(...)
+  filters <- list(...)
   queryurl <- glue::glue("{baseurl}/{dataset}")
   queryresponse <- httr::GET(queryurl,
-                             query = filters,
-                             encode = "json")
+    query = filters,
+    encode = "json"
+  )
 
   errors <- check_response(queryresponse)
   if (errors == "manretry") {
@@ -20,19 +21,23 @@ query <- function(dataset, manretry = 2, ...) {
   }
   if (errors == "autoretry") {
     queryresponse <- httr::RETRY("GET",
-                                 queryurl,
-                                 encode = "json")
+      queryurl,
+      encode = "json"
+    )
   }
   if (errors == "ok") {
     content <- httr::content(queryresponse)
-    x <- 1
-    while ((has_link(queryresponse) == TRUE) & x < 10) {
+    while (has_link(queryresponse) == TRUE) {
+      print(queryresponse$headers$links)
       nexturl <- stringr::str_match(queryresponse$headers$links, "<(.*?)>")[[2]]
-      queryurl <- glue::glue("{baseurl}{nexturl}")
+      nextfull <- paste0(baseurl, nexturl)
+      # Deals with "next" link headers that match last-retrieved url
+      if (queryurl == nextfull) break
+      queryurl <- nextfull
       queryresponse <- httr::GET(queryurl,
-                                 encode = "json")
+        encode = "json"
+      )
       content <- c(content, httr::content(queryresponse))
-      x <- x + 1
     }
     return(content)
   }
@@ -42,6 +47,7 @@ query <- function(dataset, manretry = 2, ...) {
 #' @export
 enverus2 <- function(dataset, ...) {
   initresp <- query(dataset, ...)
+  return(initresp)
 }
 
 testget <- function(statuscode) {
@@ -52,4 +58,5 @@ testget <- function(statuscode) {
 
 maketibble <- function(content) {
   df <- purrr::map_dfr(content, purrr::flatten_dfr)
+  return(df)
 }
