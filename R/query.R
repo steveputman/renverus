@@ -49,7 +49,8 @@ query <- function(dataset, manretry = 2, ...) {
 #' Query wrapper for the v2 API
 #'
 #' @param dataset A valid Enverus DirectAccess v2 API dataset as a string. For a
-#' complete list of datasets, see [link]
+#' complete list of datasets, see
+#' \url{https://app.drillinginfo.com/direct/#/api/explorer/v2/gettingStarted}
 #'
 #' @param ... A named list of query filters
 #'

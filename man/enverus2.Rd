@@ -8,7 +8,8 @@ enverus2(dataset, ...)
 }
 \arguments{
 \item{dataset}{A valid Enverus DirectAccess v2 API dataset as a string. For a
-complete list of datasets, see \link{link}}
+complete list of datasets, see
+\url{https://app.drillinginfo.com/direct/#/api/explorer/v2/gettingStarted}}
 
 \item{...}{A named list of query filters}
 }
