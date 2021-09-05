@@ -1,4 +1,3 @@
-#' @export
 query <- function(dataset, manretry = 2, ...) {
   access_token <- Sys.getenv("ENVERUS_ACCESS_TOKEN")
   api_key <- Sys.getenv("ENVERUS_API_KEY")
@@ -44,6 +43,16 @@ query <- function(dataset, manretry = 2, ...) {
 }
 
 
+#' enverus2
+#'
+#' @description
+#' Query wrapper for the v2 API
+#'
+#' @param dataset A valid Enverus DirectAccess v2 API dataset as a string. For a
+#' complete list of datasets, see [link]
+#'
+#' @param ... A named list of query filters
+#'
 #' @export
 enverus2 <- function(dataset, ...) {
   initresp <- query(dataset, ...)
