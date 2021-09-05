@@ -1,4 +1,5 @@
-baseurl <- "https://di-api.drillinginfo.com/v2/direct-access/"
+baseurl <- "https://di-api.drillinginfo.com/v2/direct-access"
+useragent <- "https://github.com/steveputman/renverus"
 
 #' Authentication
 #'
@@ -33,22 +34,25 @@ baseurl <- "https://di-api.drillinginfo.com/v2/direct-access/"
 
 #' @export
 #'
-get_access_token <- function(api_key = Sys.getenv("ENVERUS_API_KEY"), client_id =
-                               Sys.getenv("ENVERUS_CLIENT_ID"), client_secret =
-                               Sys.getenv("ENVERUS_CLIENT_SECRET")) {
-  if (anyNA(c(api_key, client_id, client_secret))) {
-    abort("`api_key`, `client_id`, and:`client_secret` must be strings.")
-  }
+get_access_token <- function(api_key = NULL, client_id = NULL, client_secret = NULL) {
+  authvars <- get_auth_vars(api_key, client_id, client_secret)
+  api_key <- authvars$api_key
+  client_id <- authvars$client_id
+  client_secret <- authvars$client_secret
+  httr::reset_config()
   response <- httr::POST(glue::glue("{baseurl}/tokens"),
                          body = list("grant_type" = "client_credentials"),
                          encode = "form",
+                         httr::user_agent(useragent),
                          httr::add_headers("X-API-KEY" = api_key),
-                         httr::authenticate(client_id, client_secret),
-                         httr::verbose())
-  resp_status <- check_response(token)
+                         httr::authenticate(client_id, client_secret)
+  )
+  resp_status <- check_response(response)
   if (resp_status == "ok") {
-    token <- httr::content(request)$access_token
+    token <- httr::content(response)$access_token
     Sys.setenv("ENVERUS_ACCESS_TOKEN" = token)
+    invisible(token)
   }
 }
+
 
