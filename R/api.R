@@ -23,15 +23,6 @@ useragent <- "https://github.com/steveputman/renverus"
 #'   `.Renviron` file. The easiest way to do this is by calling
 #'   `usethis::edit_r_environ()`. Don't forget to restart R after saving the variables.
 #'
-#' @references See [enverus link] to obtain an API key.
-#'
-#' @seealso Note that by using a Enverus API key, you agree to the Enverus API [Terms
-#'   of Use]([   ]).
-#'
-#' @name
-#'
-#' @examples
-
 #' @export
 #'
 get_access_token <- function(api_key = NULL, client_id = NULL, client_secret = NULL) {

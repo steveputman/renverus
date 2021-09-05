@@ -3,4 +3,5 @@
 export("%>%")
 export(enverus2)
 export(get_access_token)
+export(query)
 importFrom(magrittr,"%>%")

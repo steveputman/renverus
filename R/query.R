@@ -44,14 +44,12 @@ enverus2 <- function(dataset, ...) {
   initresp <- query(dataset, ...)
 }
 
-#' @export
 testget <- function(statuscode) {
   resp <- httr::GET(glue::glue("https://httpbin.org/status/{statuscode}"))
   check_response(resp)
   message("am i still going?")
 }
 
-#' @export
 maketibble <- function(content) {
   df <- purrr::map_dfr(content, purrr::flatten_dfr)
 }

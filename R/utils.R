@@ -1,9 +1,9 @@
 validate_auth_info <- function(api_key, client_id, client_secret) {
   if (anyNA(c(api_key, client_id, client_secret))) {
-    abort("`api_key`, `client_id`, and`client_secret` must be supplied as arguments or set as environment variables.")
+    stop("`api_key`, `client_id`, and`client_secret` must be supplied as arguments or set as environment variables.")
   }
   if (!is.character(api_key) | !is.character(client_id) | !is.character(client_secret)) {
-    abort("`api_key`, `client_id`, and `client_secret` must be strings.")
+    stop("`api_key`, `client_id`, and `client_secret` must be strings.")
   }
 }
 
