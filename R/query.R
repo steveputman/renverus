@@ -1,6 +1,37 @@
-query <- function(dataset, manretry = 2, ...) {
-  access_token <- Sys.getenv("ENVERUS_ACCESS_TOKEN")
-  api_key <- Sys.getenv("ENVERUS_API_KEY")
+#' query
+#'
+#' @description
+#' Query for the v2 API
+#'
+#' @param dataset A valid Enverus DirectAccess v2 API dataset as a string. For a
+#' complete list of datasets, see [Enverus API](https://app.drillinginfo.com/direct/#/api/explorer/v2/gettingStarted)
+#'
+#' @param api_key A valid Enverus DirectAccess v2 API key as a string. If a key
+#' is not provided, the query will attempt to use the `ENVERUS_API_KEY`
+#' environment variable.
+#'
+#' @param access_token A temporary token, as a string, authenticating the user.
+#' If a token is not supplied, the query will attempt to authenticate the user
+#' with the `ENVERUS_CLIENT_ID` and `ENVERUS_CLIENT_SECRET` environment
+#' variables. See [get_access_token()]
+#'
+#' @param output A string indicating the type of output returned by the query:
+#'
+#'  - `df` attempts to convert the query response into a `tibble` (the default).
+#'  - `json` returns a raw list of lists
+#'
+#' @param manretry Number of retries for user-related errors (authentication,
+#' query parameters, etc.)
+#'
+#' @param ... A named list of query filters, such as `deleteddate = "null"` to
+#' be passed to the query. See the [Enverus API](https://app.drillinginfo.com/direct/#/api/explorer/v2/gettingStarted)
+#'
+#' @export
+
+query <- function(dataset, output = "df", manretry = 2, api_key = NULL,
+                  access_token = NULL, ...) {
+  if (is.null(access_token)) access_token <- Sys.getenv("ENVERUS_ACCESS_TOKEN")
+  if (is.null(api_key)) api_key <- Sys.getenv("ENVERUS_API_KEY")
   update_httr_config(api_key, access_token, TRUE)
   filters <- list(...)
   queryurl <- glue::glue("{baseurl}/{dataset}")
@@ -38,35 +69,20 @@ query <- function(dataset, manretry = 2, ...) {
       )
       content <- c(content, httr::content(queryresponse))
     }
-    return(content)
   }
+  if (output == "df") {
+    parsed <- makedf(content)
+  } else {
+    parsed <- content
+  }
+  return(parsed)
 }
 
-
-#' enverus2
-#'
-#' @description
-#' Query wrapper for the v2 API
-#'
-#' @param dataset A valid Enverus DirectAccess v2 API dataset as a string. For a
-#' complete list of datasets, see
-#' \url{https://app.drillinginfo.com/direct/#/api/explorer/v2/gettingStarted}
-#'
-#' @param ... A named list of query filters
-#'
-#' @export
-enverus2 <- function(dataset, ...) {
-  initresp <- query(dataset, ...)
-  return(initresp)
-}
-
-testget <- function(statuscode) {
-  resp <- httr::GET(glue::glue("https://httpbin.org/status/{statuscode}"))
-  check_response(resp)
-  message("am i still going?")
-}
-
-maketibble <- function(content) {
+makedf <- function(content) {
   df <- purrr::map_dfr(content, purrr::flatten_dfr)
   return(df)
+}
+
+makecsv <- function(content) {
+
 }

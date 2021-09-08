@@ -2,18 +2,23 @@
 % Please edit documentation in R/api.R
 \name{get_access_token}
 \alias{get_access_token}
-\title{Authentication}
+\title{get_access_token}
 \usage{
 get_access_token(api_key = NULL, client_id = NULL, client_secret = NULL)
 }
 \arguments{
 \item{api_key}{A valid Enverus DirectAccess v2 API key as a string. Obtain
-one at the [API}
+one at the
+\href{https://app.drillinginfo.com/direct/#/api/explorer/v2/gettingStarted}{API site}}
 
 \item{client_id}{A valid Enverus DirectAccess v2 client ID as a string.}
 
 \item{client_secret}{A valid Enverus DirectAccess v2 client secret as a
 string}
+}
+\value{
+Returns he retrieved token invisibly and sets the
+\code{ENVERUS_ACCESS_TOKEN} environment variable.
 }
 \description{
 Users of Enverus DirectAccess v2 must authenticate with an API key and a
@@ -28,8 +33,8 @@ arguments.
 }
 \details{
 The preferred method to set the key is to set the \code{ENVERUS_API_KEY},
-\code{ENVERUS_CLIENT_ID}, and \code{ENVERUS_CLIENT_SECRET} environment variables in
-an \code{.Renviron} file. The easiest way to do this is by calling
+\code{ENVERUS_CLIENT_ID}, and \code{ENVERUS_CLIENT_SECRET} environment variables in an
+\code{.Renviron} file. The easiest way to do this is by calling
 \code{usethis::edit_r_environ()}. Don't forget to restart R after saving the
 variables.
 }

@@ -1,7 +1,7 @@
 baseurl <- "https://di-api.drillinginfo.com/v2/direct-access"
 useragent <- "https://github.com/steveputman/renverus"
 
-#' Authentication
+#' get_access_token
 #'
 #' @description
 #' Users of Enverus DirectAccess v2 must authenticate with an API key and a
@@ -14,7 +14,8 @@ useragent <- "https://github.com/steveputman/renverus"
 #' `client_id`, and `client_secret`
 #'
 #' @param api_key A valid Enverus DirectAccess v2 API key as a string. Obtain
-#' one at the [API
+#' one at the
+#' [API site](https://app.drillinginfo.com/direct/#/api/explorer/v2/gettingStarted)
 #'
 #' @param client_id A valid Enverus DirectAccess v2 client ID as a string.
 #'
@@ -22,11 +23,14 @@ useragent <- "https://github.com/steveputman/renverus"
 #' string
 #'
 #' @details
-#'   The preferred method to set the key is to set the `ENVERUS_API_KEY`,
-#'   `ENVERUS_CLIENT_ID`, and `ENVERUS_CLIENT_SECRET` environment variables in
-#'   an `.Renviron` file. The easiest way to do this is by calling
-#'   `usethis::edit_r_environ()`. Don't forget to restart R after saving the
-#'   variables.
+#' The preferred method to set the key is to set the `ENVERUS_API_KEY`,
+#' `ENVERUS_CLIENT_ID`, and `ENVERUS_CLIENT_SECRET` environment variables in an
+#' `.Renviron` file. The easiest way to do this is by calling
+#' `usethis::edit_r_environ()`. Don't forget to restart R after saving the
+#' variables.
+#'
+#' @return Returns he retrieved token invisibly and sets the
+#' `ENVERUS_ACCESS_TOKEN` environment variable.
 #'
 #' @export
 #'
