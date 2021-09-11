@@ -23,17 +23,19 @@
 #' @param manretry Number of retries for user-related errors (authentication,
 #' query parameters, etc.)
 #'
+#' @param pagesize Number of items per page received. Defaults to 10,000.
+#'
 #' @param ... A named list of query filters, such as `deleteddate = "null"` to
 #' be passed to the query. See the [Enverus API](https://app.drillinginfo.com/direct/#/api/explorer/v2/gettingStarted)
 #'
 #' @export
 
 query <- function(dataset, output = "df", manretry = 2, api_key = NULL,
-                  access_token = NULL, ...) {
+                  access_token = NULL, pagesize = 10000, ...) {
   if (is.null(access_token)) access_token <- Sys.getenv("ENVERUS_ACCESS_TOKEN")
   if (is.null(api_key)) api_key <- Sys.getenv("ENVERUS_API_KEY")
   update_httr_config(api_key, access_token, TRUE)
-  filters <- list(...)
+  filters <- c(..., "pagesize" = pagesize)
   queryurl <- glue::glue("{baseurl}/{dataset}")
   queryresponse <- httr::GET(queryurl,
     query = filters,
@@ -74,6 +76,47 @@ query <- function(dataset, output = "df", manretry = 2, api_key = NULL,
     parsed <- makedf(content)
   } else {
     parsed <- content
+  }
+  return(parsed)
+}
+
+#' count
+#'
+#' @description
+#' Count number of records in query
+#'
+#' @inheritParams query
+#'
+#' @export
+count <- function(dataset, output = "df", manretry = 2, api_key = NULL,
+                  access_token = NULL, ...) {
+  if (is.null(access_token)) access_token <- Sys.getenv("ENVERUS_ACCESS_TOKEN")
+  if (is.null(api_key)) api_key <- Sys.getenv("ENVERUS_API_KEY")
+  update_httr_config(api_key, access_token, TRUE)
+  filters <- list(...)
+  queryurl <- glue::glue("{baseurl}/{dataset}")
+  queryresponse <- httr::HEAD(queryurl,
+    query = filters,
+    encode = "json"
+  )
+
+  errors <- check_response(queryresponse)
+  if (errors == "manretry") {
+    if (manretry > 0) {
+      manretry <- manretry - 1
+      query(dataset, manretry, ...)
+    } else {
+      stop("Still failing; stopping.")
+    }
+  }
+  if (errors == "autoretry") {
+    queryresponse <- httr::RETRY("HEAD",
+      queryurl,
+      encode = "json"
+    )
+  }
+  if (errors == "ok") {
+    parsed <- as.integer(queryresponse$headers$`x-query-record-count`)
   }
   return(parsed)
 }
