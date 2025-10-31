@@ -1,5 +1,5 @@
-baseurl <- "https://api.enverus.com/v3/direct-access"
-useragent <- "https://github.com/steveputman/renverus"
+basereq <- httr2::request("https://api.enverus.com/v3/direct-access") |>
+  httr2::req_user_agent("https://github.com/steveputman/renverus")
 
 #' get_access_token
 #'
@@ -29,23 +29,39 @@ useragent <- "https://github.com/steveputman/renverus"
 #' @export
 #'
 get_access_token <- function(api_key = NULL) {
-  req <- httr2::request(baseurl) |>
-    httr2::req_url_path("tokens") |>
+  if (is.null(api_key)) {
+    api_key <- Sys.getenv("ENVERUS_V3_API_KEY")
+  }
+  req <- basereq |>
+    httr2::req_url_path_append("tokens") |>
     httr2::req_body_json(list(secretKey = api_key))
 
-
-
-
-  response <- httr::POST(glue::glue("{baseurl}/tokens"),
-    body = list("grant_type" = "client_credentials"),
-    encode = "form",
-    httr::user_agent(useragent),
-    httr::add_headers("secretKey" = api_key),
-  )
-  resp_status <- check_response(response)
-  if (resp_status == "ok") {
-    token <- httr::content(response)$access_token
-    Sys.setenv("ENVERUS_ACCESS_TOKEN" = token)
+  resp <- httr2::req_perform(req)
+  if (httr2::resp_is_error(resp)) {
+    stop("Error: ", httr2::resp_status_desc(resp), call. = FALSE)
+  } else {
+    token <- httr2::resp_body_json(resp)$token
+    Sys.setenv("ENVERUS_V3_ACCESS_TOKEN" = token)
     invisible(token)
   }
 }
+
+test_call <- function(token = NULL) {
+  if (is.null(token)) {
+    token <- Sys.getenv("ENVERUS_V3_ACCESS_TOKEN")
+  }
+  req <- basereq |>
+    httr2::req_url_path_append("rigs") |>
+    httr2::req_url_query(deleteddate = "null") |>
+    httr2::req_auth_bearer_token(token)
+
+  resp <- httr2::req_perform(req)
+  if (httr2::resp_is_error(resp)) {
+    stop("Error: ", httr2::resp_status_desc(resp), call. = FALSE)
+  } else {
+    return(TRUE)
+  }
+}
+
+
+
